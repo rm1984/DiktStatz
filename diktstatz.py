@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
 
+#
+# DiktStatz.py
+# ------------
+# A simple Python script that prints some useful statistical information by
+# readgin a given passwords dictionary.
+#
+# Coded by: Riccardo Mollo (riccardomollo84@gmail.com)
+#
+
+#### TODO:
+#### - ???
+
 import argparse
+import os
 import signal
 import sys
 from prettytable import PrettyTable
@@ -30,19 +43,16 @@ def percent(n1, n2):
 def main(argv):
     parser = argparse.ArgumentParser(prog = 'diktstatz.py')
     parser.add_argument('-d', '--dictionary', help = 'text file containing a lot of juicy passwords', required = True)
-    parser.add_argument('-m', '--max-length', help = 'only passwords with length up to this value will be considered (default: 16)', required = False)
+    parser.add_argument('-m', '--max-length', help = 'only passwords with length up to this value will be considered', required = False)
     args = parser.parse_args()
     dict_file = args.dictionary
-    max_length = MAX_LENGTH if args.max_length is None else int(args.max_length)
+    dict_size = os.stat(dict_file).st_size
+    max_length = len(max(open(dict_file), key = len)) if args.max_length is None else int(args.max_length)
 
     logo()
 
     total = sum(1 for i in open(dict_file, 'r'))
     semit = 0
-
-    print('Dictionary: ' + dict_file)
-    print("Max password length considered: " + str(max_length))
-    print("Total number of passwords: " + str(total))
 
     counters = {}
 
@@ -61,7 +71,12 @@ def main(argv):
             except Exception as exception:
                 pass
 
-    print("Partial number of passwords: " + str(semit))
+    print('Dictionary file:       ' + os.path.abspath(dict_file))
+    print('Dictionary size:       ' + str(dict_size) + ' bytes')
+    print('Max password length:   ' + str(max_length) + ' characters')
+    print('Avg password length:   ' + str(round(dict_size / total)) + ' characters')
+    print('Total passwords:       ' + str(total))
+    print('Considered passwords:  ' + str(semit) + ' (' + percent(semit, total) + ')')
     print()
 
     table = PrettyTable()
