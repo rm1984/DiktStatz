@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
+import argparse
 import signal
 import sys
-import texttable
+from prettytable import PrettyTable
 from termcolor import colored
+
+# constants
+MAX_LENGTH = 16
 
 def signal_handler(s, frame):
     if s == 2: # SIGINT
@@ -24,22 +28,25 @@ def percent(n1, n2):
     return '{0:.2f}%'.format((n1 / n2 * 100))
 
 def main(argv):
-    dict_file = 'dict2.txt'
+    parser = argparse.ArgumentParser(prog = 'diktstatz.py')
+    parser.add_argument('-d', '--dictionary', help = 'text file containing a lot of juicy passwords', required = True)
+    parser.add_argument('-m', '--max-length', help = 'only passwords with length up to this value will be considered (default: 16)', required = False)
+    args = parser.parse_args()
+    dict_file = args.dictionary
+    max_length = MAX_LENGTH if args.max_length is None else int(args.max_length)
 
     logo()
-
-    MAX_PASSWORD_LENGTH = 16
 
     total = sum(1 for i in open(dict_file, 'r'))
     semit = 0
 
     print('Dictionary: ' + dict_file)
-    print("Max password length considered: " + str(MAX_PASSWORD_LENGTH))
+    print("Max password length considered: " + str(max_length))
     print("Total number of passwords: " + str(total))
 
     counters = {}
 
-    for i in range(MAX_PASSWORD_LENGTH):
+    for i in range(max_length):
         counters[i] = 0
 
     with open(dict_file) as dict:
@@ -57,27 +64,22 @@ def main(argv):
     print("Partial number of passwords: " + str(semit))
     print()
 
-    table = texttable.Texttable()
-    thead = ['Length', 'Passwords', 'Percentage']
-    table.header(thead)
+    table = PrettyTable()
+    table.field_names = ['Length', 'Passwords', 'Relative Percentage', 'Total Percentage']
+    table.align['Length'] = 'r'
+    table.align['Passwords'] = 'r'
+    table.align['Relative Percentage'] = 'r'
+    table.align['Total Percentage'] = 'r'
+    table.sortby = 'Passwords'
+    table.reversesort = True
 
-    length = []
-    passwords = []
-    percentage = []
-
-    for i in range(MAX_PASSWORD_LENGTH):
+    for i in range(max_length):
         try:
-            length.append(i)
-            passwords.append(counters[i])
-            percentage.append(percent(counters[i], semit))
+            table.add_row([i, counters[i], percent(counters[i], semit), percent(counters[i], total)])
         except KeyError as keyerror:
             print(keyerror)
 
-    for row in zip(length, passwords, percentage):
-        table.add_row(row)
-
-    table.sortby = 'Passwords'
-    print(table.draw())
+    print(table)
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
