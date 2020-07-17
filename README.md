@@ -4,7 +4,7 @@
 
 **Usage:**
 ```
-usage: diktstatz.py [-h] -d DICTIONARY [-m MAX_LENGTH]
+usage: diktstatz.py [-h] -d DICTIONARY [-m MAX_LENGTH] [-o OUTPUT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -12,11 +12,13 @@ optional arguments:
                         text file containing a lot of juicy passwords
   -m MAX_LENGTH, --max-length MAX_LENGTH
                         only passwords with length up to this value will be considered
+  -o OUTPUT, --output OUTPUT
+                        save results' output as a CSV file
 ```
 
 **Example output:**
 ```
-$ ./diktstatz.py -d /tmp/dict.txt
+$ ./diktstatz.py -d /tmp/dict.txt -o /tmp/dict.csv
  _          __            
 | \ o | _|_(_ _|_ _ _|_ _ 
 |_/ | |< |___) |_(_| |_ /_
@@ -65,4 +67,6 @@ Considered passwords:  10000000 (100.00%)
 |     29 |       114 |      0.00% |
 |      1 |       104 |      0.00% |
 +--------+-----------+------------+
+
+Output saved to CSV file: /tmp/dict.csv
 ```

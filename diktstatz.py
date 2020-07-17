@@ -13,10 +13,12 @@
 #### - ???
 
 import argparse
+import csv
 import os
 import signal
 import sys
 from prettytable import PrettyTable
+from prettytable import PLAIN_COLUMNS
 from termcolor import colored
 
 # constants
@@ -47,10 +49,12 @@ def main(argv):
     parser = argparse.ArgumentParser(prog = 'diktstatz.py')
     parser.add_argument('-d', '--dictionary', help = 'text file containing a lot of juicy passwords', required = True)
     parser.add_argument('-m', '--max-length', help = 'only passwords with length up to this value will be considered', required = False)
+    parser.add_argument('-o', '--output', help = 'save results\' output as a CSV file', required = False)
     args = parser.parse_args()
     dict_file = args.dictionary
     dict_size = os.stat(dict_file).st_size
     max_length = len(max(open(dict_file), key = len))
+    output = args.output
 
     if args.max_length is not None:
         if int(args.max_length) > 0 and int(args.max_length) <= max_length:
@@ -91,10 +95,17 @@ def main(argv):
     else:
         table = PrettyTable()
 
+        if output is not None:
+            csv_file = open(output, 'w')
+            writer = csv.writer(csv_file)
+
         if args.max_length is None:
             table.field_names = ['Length', 'Passwords', 'Percentage']
         else:
             table.field_names = ['Length', 'Passwords', 'Rel. Percentage', 'Percentage']
+
+        if output is not None:
+            writer.writerow(table.field_names)
 
         table.align['Length'] = 'r'
         table.align['Passwords'] = 'r'
@@ -112,13 +123,23 @@ def main(argv):
             if counters[i] > 0:
                 try:
                     if args.max_length is None:
-                        table.add_row([i, counters[i], percent(counters[i], total)])
+                        row = [i, counters[i], percent(counters[i], total)]
                     else:
-                        table.add_row([i, counters[i], percent(counters[i], semit), percent(counters[i], total)])
+                        row = [i, counters[i], percent(counters[i], semit), percent(counters[i], total)]
+
+                    table.add_row(row)
+
+                    if output is not None:
+                        writer.writerow(row)
                 except KeyError as keyerror:
                     print(keyerror)
 
         print(table)
+
+        if output is not None:
+            csv_file.close()
+            print()
+            print('Output saved to CSV file: ' +  output)
     print()
 
 if __name__ == '__main__':
