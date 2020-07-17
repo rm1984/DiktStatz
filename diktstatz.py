@@ -18,7 +18,6 @@ import os
 import signal
 import sys
 from prettytable import PrettyTable
-from prettytable import PLAIN_COLUMNS
 from termcolor import colored
 
 # constants
@@ -52,6 +51,11 @@ def main(argv):
     parser.add_argument('-o', '--output', help = 'save results\' output as a CSV file', required = False)
     args = parser.parse_args()
     dict_file = args.dictionary
+
+    if not os.path.isfile(dict_file):
+        error('File "' + dict_file + '" does not exist or is not readable.')
+        sys.exit(1)
+
     dict_size = os.stat(dict_file).st_size
     max_length = len(max(open(dict_file), key = len))
     output = args.output
@@ -96,8 +100,15 @@ def main(argv):
         table = PrettyTable()
 
         if output is not None:
-            csv_file = open(output, 'w')
-            writer = csv.writer(csv_file)
+            try:
+                csv_file = open(output, 'w')
+                writer = csv.writer(csv_file)
+            except PermissionError as permissionerror:
+                error('Cannot write file "' + output + '". Permission denied.')
+                sys.exit(1)
+            except IsADirectoryError as isadirectoryerror:
+                error('"' + output + '" is a directory, not a file.')
+                sys.exit(1)
 
         if args.max_length is None:
             table.field_names = ['Length', 'Passwords', 'Percentage']
