@@ -27,9 +27,9 @@ DiktStatz - Statistics for password dictionaries
 Coded by: Riccardo Mollo
 
 Dictionary file:       /tmp/dict.txt
-Dictionary size:       94461698 bytes
-Max password length:   31 characters
-Avg password length:   9 characters
+Dictionary size:       84458277 bytes
+Max password length:   30 characters
+Avg password length:   8 characters
 Total passwords:       10000000
 Considered passwords:  10000000 (100.00%)
 
@@ -67,6 +67,16 @@ Considered passwords:  10000000 (100.00%)
 |     29 |       114 |      0.00% |
 |      1 |       104 |      0.00% |
 +--------+-----------+------------+
+
++-----------------+---------+
+| Password type   |   Count |
++-----------------+---------+
+| Alphanumeric    | 9840534 |
+| Alphabetic only | 2285382 |
+| Digits only     | 1176834 |
+| Lowercase only  | 7656334 |
+| Uppercase only  |  208356 |
++-----------------+---------+
 
 Output saved to CSV file: /tmp/dict.csv
 ```

@@ -20,9 +20,6 @@ import sys
 from prettytable import PrettyTable
 from termcolor import colored
 
-# constants
-MAX_LENGTH = 16
-
 def signal_handler(s, frame):
     if s == 2: # SIGINT
         print('You pressed Ctrl+C!')
@@ -44,6 +41,14 @@ def error(message):
 def percent(n1, n2):
     return '{0:.2f}%'.format((n1 / n2 * 100))
 
+def count_chars(file):
+    f = open(file, 'r')
+    d = f.read().replace('\n', '')
+    n = len(d)
+    f.close()
+
+    return n
+
 def main(argv):
     parser = argparse.ArgumentParser(prog = 'diktstatz.py')
     parser.add_argument('-d', '--dictionary', help = 'text file containing a lot of juicy passwords', required = True)
@@ -56,8 +61,14 @@ def main(argv):
         error('File "' + dict_file + '" does not exist or is not readable.')
         sys.exit(1)
 
-    dict_size = os.stat(dict_file).st_size
-    max_length = len(max(open(dict_file), key = len))
+    dict_size = count_chars(dict_file)
+
+    try:
+        max_length = len(max(open(dict_file), key = len))
+    except ValueError as valueerror:
+        error('File "' + dict_file + '" seems to be empty.')
+        sys.exit(1)
+
     output = args.output
 
     if args.max_length is not None:
@@ -70,25 +81,47 @@ def main(argv):
     semit = 0
 
     counters = {}
+    alnum = 0
+    alpha = 0
+    digit = 0
+    lower = 0
+    upper = 0
 
     for i in range(max_length):
         counters[i] = 0
 
     with open(dict_file) as dict:
         for password in dict:
-            l = len(password.rstrip('\n'))
+            password = password.rstrip('\n')
+            l = len(password)
 
-            try:
-                counters[l] += 1
-                semit += 1
-            except IndexError as indexerror:
-                pass
-            except Exception as exception:
-                pass
+            if l <= max_length:
+                if password.isalnum():
+                    alnum += 1
+                
+                if password.isalpha():
+                    alpha += 1
+
+                if password.isdigit():
+                    digit += 1
+
+                if password.islower():
+                    lower += 1
+
+                if password.isupper():
+                    upper += 1
+
+                try:
+                    counters[l] += 1
+                    semit += 1
+                except IndexError as indexerror:
+                    pass
+                except Exception as exception:
+                    pass
 
     print('Dictionary file:       ' + os.path.abspath(dict_file))
     print('Dictionary size:       ' + str(dict_size) + ' bytes')
-    print('Max password length:   ' + str(max_length) + ' characters')
+    print('Max password length:   ' + str(max_length - 1) + ' characters')
     print('Avg password length:   ' + str(round(dict_size / total)) + ' characters')
     print('Total passwords:       ' + str(total))
     print('Considered passwords:  ' + str(semit) + ' (' + percent(semit, total) + ')')
@@ -97,7 +130,8 @@ def main(argv):
     if semit == 0:
         print('No passwords with length less or equal to ' + str(max_length) + ' characters.')
     else:
-        table = PrettyTable()
+        pwtable = PrettyTable()
+        chtable = PrettyTable()
 
         if output is not None:
             try:
@@ -111,24 +145,24 @@ def main(argv):
                 sys.exit(1)
 
         if args.max_length is None:
-            table.field_names = ['Length', 'Passwords', 'Percentage']
+            pwtable.field_names = ['Length', 'Passwords', 'Percentage']
         else:
-            table.field_names = ['Length', 'Passwords', 'Rel. Percentage', 'Percentage']
+            pwtable.field_names = ['Length', 'Passwords', 'Rel. Percentage', 'Percentage']
 
         if output is not None:
-            writer.writerow(table.field_names)
+            writer.writerow(pwtable.field_names)
 
-        table.align['Length'] = 'r'
-        table.align['Passwords'] = 'r'
+        pwtable.align['Length'] = 'r'
+        pwtable.align['Passwords'] = 'r'
 
         if args.max_length is None:
-            table.align['Percentage'] = 'r'
+            pwtable.align['Percentage'] = 'r'
         else:
-            table.align['Rel. Percentage'] = 'r'
-            table.align['Percentage'] = 'r'
+            pwtable.align['Rel. Percentage'] = 'r'
+            pwtable.align['Percentage'] = 'r'
 
-        table.sortby = 'Passwords'
-        table.reversesort = True
+        pwtable.sortby = 'Passwords'
+        pwtable.reversesort = True
 
         for i in range(max_length):
             if counters[i] > 0:
@@ -138,14 +172,27 @@ def main(argv):
                     else:
                         row = [i, counters[i], percent(counters[i], semit), percent(counters[i], total)]
 
-                    table.add_row(row)
+                    pwtable.add_row(row)
 
                     if output is not None:
                         writer.writerow(row)
                 except KeyError as keyerror:
                     print(keyerror)
 
-        print(table)
+        print(pwtable)
+
+        chtable.field_names = ['Password type', 'Count']
+        chtable.align['Password type'] = 'l'
+        chtable.align['Count'] = 'r'
+
+        chtable.add_row(['Alphanumeric', alnum])
+        chtable.add_row(['Alphabetic only', alpha])
+        chtable.add_row(['Digits only', digit])
+        chtable.add_row(['Lowercase only', lower])
+        chtable.add_row(['Uppercase only', upper])
+
+        print()
+        print(chtable)
 
         if output is not None:
             csv_file.close()
