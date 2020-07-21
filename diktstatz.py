@@ -121,7 +121,7 @@ def main(argv):
 
     print('Dictionary file:       ' + os.path.abspath(dict_file))
     print('Dictionary size:       ' + str(dict_size) + ' bytes')
-    print('Max password length:   ' + str(max_length - 1) + ' characters')
+    print('Max password length:   ' + str(max_length - 1) + ' characters' + (' (forced by user)' if args.max_length is not None and total != semit else ''))
     print('Avg password length:   ' + str(round(dict_size / total)) + ' characters')
     print('Total passwords:       ' + str(total))
     print('Considered passwords:  ' + str(semit) + ' (' + percent(semit, total) + ')')
@@ -145,9 +145,9 @@ def main(argv):
                 sys.exit(1)
 
         if args.max_length is None:
-            pwtable.field_names = ['Length', 'Passwords', 'Percentage']
+            pwtable.field_names = ['Length', 'Passwords', 'Total %']
         else:
-            pwtable.field_names = ['Length', 'Passwords', 'Rel. Percentage', 'Percentage']
+            pwtable.field_names = ['Length', 'Passwords', 'Relative %', 'Total %']
 
         if output is not None:
             writer.writerow(pwtable.field_names)
@@ -156,10 +156,10 @@ def main(argv):
         pwtable.align['Passwords'] = 'r'
 
         if args.max_length is None:
-            pwtable.align['Percentage'] = 'r'
+            pwtable.align['Total %'] = 'r'
         else:
-            pwtable.align['Rel. Percentage'] = 'r'
-            pwtable.align['Percentage'] = 'r'
+            pwtable.align['Relative %'] = 'r'
+            pwtable.align['Total %'] = 'r'
 
         pwtable.sortby = 'Passwords'
         pwtable.reversesort = True
@@ -181,15 +181,16 @@ def main(argv):
 
         print(pwtable)
 
-        chtable.field_names = ['Password type', 'Count']
+        chtable.field_names = ['Password type', 'Count', 'Count %']
         chtable.align['Password type'] = 'l'
         chtable.align['Count'] = 'r'
+        chtable.align['Count %'] = 'r'
 
-        chtable.add_row(['Alphanumeric', alnum])
-        chtable.add_row(['Alphabetic only', alpha])
-        chtable.add_row(['Digits only', digit])
-        chtable.add_row(['Lowercase only', lower])
-        chtable.add_row(['Uppercase only', upper])
+        chtable.add_row(['Alphanumeric', alnum, percent(alnum, semit)])
+        chtable.add_row(['Alphabetic only', alpha, percent(alpha, semit)])
+        chtable.add_row(['Digits only', digit, percent(digit, semit)])
+        chtable.add_row(['Lowercase only', lower, percent(lower, semit)])
+        chtable.add_row(['Uppercase only', upper, percent(upper, semit)])
 
         print()
         print(chtable)
