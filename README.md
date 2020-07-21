@@ -18,7 +18,7 @@ optional arguments:
 
 **Example output:**
 ```
-$ ./diktstatz.py -d /tmp/dict.txt -m 16 -o /tmp/dict.csv
+$ ./diktstatz.py -d /tmp/dict.txt -m 16 -o /tmp/dict.csv 
  _          __            
 | \ o | _|_(_ _|_ _ _|_ _ 
 |_/ | |< |___) |_(_| |_ /_
@@ -54,15 +54,16 @@ Considered passwords:  9972772 (99.73%)
 |      1 |       104 |      0.00% |   0.00% |
 +--------+-----------+------------+---------+
 
-+-----------------+---------+---------+
-| Password type   |   Count | Count % |
-+-----------------+---------+---------+
-| Alphanumeric    | 9824938 |  98.52% |
-| Alphabetic only | 2282558 |  22.89% |
-| Digits only     | 1176271 |  11.79% |
-| Lowercase only  | 7641431 |  76.62% |
-| Uppercase only  |  207716 |   2.08% |
-+-----------------+---------+---------+
++--------------------+---------+---------+
+| Password type      |   Count | Count % |
++--------------------+---------+---------+
+| Alphanumeric       | 9824938 |  98.52% |
+| Alphabetic only    | 2282558 |  22.89% |
+| Digits only        | 1176271 |  11.79% |
+| Lowercase only     | 7641431 |  76.62% |
+| Uppercase only     |  207716 |   2.08% |
+| With special chars |   79333 |   0.80% |
++--------------------+---------+---------+
 
 Output saved to CSV file: /tmp/dict.csv
 ```

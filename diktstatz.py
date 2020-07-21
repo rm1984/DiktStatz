@@ -15,10 +15,14 @@
 import argparse
 import csv
 import os
+import re
 import signal
 import sys
 from prettytable import PrettyTable
 from termcolor import colored
+
+# constants
+SPECIAL_CHARS = '[@_!#$%^&*()<>?/\\|}{~:]'
 
 def signal_handler(s, frame):
     if s == 2: # SIGINT
@@ -79,16 +83,18 @@ def main(argv):
 
     total = sum(1 for i in open(dict_file, 'r'))
     semit = 0
-
     counters = {}
+
+    for i in range(max_length):
+        counters[i] = 0
+
+    sc_re = re.compile(SPECIAL_CHARS)
     alnum = 0
     alpha = 0
     digit = 0
     lower = 0
     upper = 0
-
-    for i in range(max_length):
-        counters[i] = 0
+    specl = 0
 
     with open(dict_file) as dict:
         for password in dict:
@@ -110,6 +116,9 @@ def main(argv):
 
                 if password.isupper():
                     upper += 1
+
+                if sc_re.search(password) is not None:
+                    specl += 1
 
                 try:
                     counters[l] += 1
@@ -180,6 +189,7 @@ def main(argv):
                     print(keyerror)
 
         print(pwtable)
+        print()
 
         chtable.field_names = ['Password type', 'Count', 'Count %']
         chtable.align['Password type'] = 'l'
@@ -191,8 +201,8 @@ def main(argv):
         chtable.add_row(['Digits only', digit, percent(digit, semit)])
         chtable.add_row(['Lowercase only', lower, percent(lower, semit)])
         chtable.add_row(['Uppercase only', upper, percent(upper, semit)])
+        chtable.add_row(['With special chars', specl, percent(specl, semit)])
 
-        print()
         print(chtable)
 
         if output is not None:
