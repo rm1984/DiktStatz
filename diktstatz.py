@@ -89,12 +89,14 @@ def main(argv):
         counters[i] = 0
 
     sc_re = re.compile(SPECIAL_CHARS)
+    wn_re = re.compile('[a-zA-Z]+\d+$', re.IGNORECASE) # eg: "Foo123" or "password999" or "Test0"
     alnum = 0
     alpha = 0
     digit = 0
     lower = 0
     upper = 0
     specl = 0
+    wdnum = 0
 
     with open(dict_file) as dict:
         for password in dict:
@@ -119,6 +121,9 @@ def main(argv):
 
                 if sc_re.search(password) is not None:
                     specl += 1
+
+                if wn_re.search(password) is not None:
+                    wdnum += 1
 
                 try:
                     counters[l] += 1
@@ -202,6 +207,7 @@ def main(argv):
         chtable.add_row(['Lowercase only', lower, percent(lower, semit)])
         chtable.add_row(['Uppercase only', upper, percent(upper, semit)])
         chtable.add_row(['With special chars', specl, percent(specl, semit)])
+        chtable.add_row(['"WordNumber" format', wdnum, percent(wdnum, semit)])
 
         print(chtable)
 
