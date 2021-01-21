@@ -22,7 +22,7 @@ from prettytable import PrettyTable
 from termcolor import colored
 
 # constants
-SPECIAL_CHARS = '[@_!#$%^&*()<>?/\\|}{~:]'
+SPECIAL_CHARS = '[@_!#$%^&*()<>?/\\|}{~:]=/'
 
 def signal_handler(s, frame):
     if s == 2: # SIGINT
@@ -106,7 +106,7 @@ def main(argv):
             if l <= max_length:
                 if password.isalnum():
                     alnum += 1
-                
+
                 if password.isalpha():
                     alpha += 1
 
