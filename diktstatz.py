@@ -53,7 +53,7 @@ def count_chars(file):
 
     return n
 
-def main(argv):
+def main():
     parser = argparse.ArgumentParser(prog = 'diktstatz.py')
     parser.add_argument('-d', '--dictionary', help = 'text file containing a lot of juicy passwords', required = True)
     parser.add_argument('-m', '--max-length', help = 'only passwords with length up to this value will be considered', required = False)
@@ -69,7 +69,7 @@ def main(argv):
 
     try:
         max_length = len(max(open(dict_file), key = len))
-    except ValueError as valueerror:
+    except ValueError:
         error('File "' + dict_file + '" seems to be empty.')
         sys.exit(1)
 
@@ -98,8 +98,8 @@ def main(argv):
     specl = 0
     wdnum = 0
 
-    with open(dict_file) as dict:
-        for password in dict:
+    with open(dict_file) as dictionary:
+        for password in dictionary:
             password = password.rstrip('\n')
             l = len(password)
 
@@ -128,9 +128,9 @@ def main(argv):
                 try:
                     counters[l] += 1
                     semit += 1
-                except IndexError as indexerror:
+                except IndexError:
                     pass
-                except Exception as exception:
+                except Exception:
                     pass
 
     print('Dictionary file:       ' + os.path.abspath(dict_file))
@@ -151,10 +151,10 @@ def main(argv):
             try:
                 csv_file = open(output, 'w')
                 writer = csv.writer(csv_file)
-            except PermissionError as permissionerror:
+            except PermissionError:
                 error('Cannot write file "' + output + '". Permission denied.')
                 sys.exit(1)
-            except IsADirectoryError as isadirectoryerror:
+            except IsADirectoryError:
                 error('"' + output + '" is a directory, not a file.')
                 sys.exit(1)
 
@@ -219,4 +219,4 @@ def main(argv):
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
-    main(sys.argv[1:])
+    main()
