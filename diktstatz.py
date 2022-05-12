@@ -93,6 +93,7 @@ def main():
     upper = 0
     specl = 0
     wdnum = 0
+    space = 0
 
     with open(dict_file) as dictionary:
         for password in dictionary:
@@ -120,6 +121,9 @@ def main():
 
                 if wn_re.search(password) is not None:
                     wdnum += 1
+
+                if re.search('\s', password) is not None:
+                    space += 1
 
                 try:
                     counters[l] += 1
@@ -202,6 +206,7 @@ def main():
         chtable.add_row(['Digits only', digit, percent(digit, semit)])
         chtable.add_row(['Lowercase only', lower, percent(lower, semit)])
         chtable.add_row(['Uppercase only', upper, percent(upper, semit)])
+        chtable.add_row(['With spaces', space, percent(space, semit)])
         chtable.add_row(['With special chars', specl, percent(specl, semit)])
         chtable.add_row(['"WordNumber" format', wdnum, percent(wdnum, semit)])
 
