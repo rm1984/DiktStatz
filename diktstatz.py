@@ -65,6 +65,7 @@ def main():
     dict_size = count_chars(dict_file)
 
     try:
+        min_length = len(min(open(dict_file), key = len))
         max_length = len(max(open(dict_file), key = len))
     except ValueError:
         error('File "' + dict_file + '" seems to be empty.')
@@ -135,6 +136,7 @@ def main():
 
     print('Dictionary file:       ' + os.path.abspath(dict_file))
     print('Dictionary size:       ' + str(dict_size) + ' bytes')
+    print('Min password length:   ' + str(min_length - 1))
     print('Max password length:   ' + str(max_length - 1) + ' characters' + (' (forced by user)' if args.max_length is not None and total != semit else ''))
     print('Avg password length:   ' + str(round(dict_size / total)) + ' characters')
     print('Total passwords:       ' + str(total))
