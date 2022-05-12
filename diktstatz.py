@@ -21,9 +21,6 @@ import sys
 from prettytable import PrettyTable
 from termcolor import colored
 
-# constants
-SPECIAL_CHARS = '[@_!#$%^&*()<>?/\\|}{~:]=/'
-
 def signal_handler(s, frame):
     if s == 2: # SIGINT
         print('You pressed Ctrl+C!')
@@ -88,7 +85,6 @@ def main():
     for i in range(max_length):
         counters[i] = 0
 
-    sc_re = re.compile(SPECIAL_CHARS)
     wn_re = re.compile('[a-zA-Z]+\d+$', re.IGNORECASE) # eg: "Foo123" or "password999" or "Test0"
     alnum = 0
     alpha = 0
@@ -119,7 +115,7 @@ def main():
                 if password.isupper():
                     upper += 1
 
-                if sc_re.search(password) is not None:
+                if any(not c.isalnum() for c in password):
                     specl += 1
 
                 if wn_re.search(password) is not None:
